@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SENTINAL Africa — Live Platform Prototype | GovTech Hackathon 2026</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060C14;--panel:#0D1824;--panel2:#0B1F2E;--panel3:#0E2035;
+  --teal:#005C4E;--teal2:#007A68;--teal3:#00C8A8;
+  --gold:#C8860A;--gold2:#F59E0B;
+  --red:#DC2626;--red2:#EF4444;
+  --amber:#D97706;--green:#15803D;--green2:#4ADE80;
+  --white:#FFFFFF;--grey:#64748B;--faint:#94A3B8;
+  --line:rgba(255,255,255,.07);--line2:rgba(0,200,168,.2);
+  --font:'Segoe UI',system-ui,sans-serif;
+  --mono:'Courier New',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:#fff;font-family:var(--font);font-size:13px;display:flex;flex-direction:column}
+
+/* ── TOP BAR ── */
+.topbar{height:48px;background:var(--panel);border-bottom:1px solid var(--line2);
+  display:flex;align-items:center;padding:0 1.2rem;gap:1rem;flex-shrink:0;z-index:100}
+.tb-logo{display:flex;align-items:center;gap:.6rem}
+.tb-hex{width:28px;height:28px}
+.tb-brand{font-size:.72rem;font-weight:700;letter-spacing:.12em;color:#fff}
+.tb-sub{font-size:.52rem;color:var(--teal3);letter-spacing:.15em;display:block;margin-top:.1rem}
+.tb-divider{width:1px;height:24px;background:var(--line)}
+.tb-dept{font-size:.72rem;color:var(--faint)}
+.tb-dept strong{color:#fff}
+.tb-spacer{flex:1}
+.tb-alert{display:flex;align-items:center;gap:.4rem;background:rgba(220,38,38,.15);
+  border:1px solid rgba(220,38,38,.3);padding:.25rem .7rem;border-radius:2px}
+.tb-alert-dot{width:6px;height:6px;border-radius:50%;background:var(--red2);animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.tb-alert span{font-size:.68rem;color:var(--red2);font-weight:600}
+.tb-time{font-family:var(--mono);font-size:.68rem;color:var(--faint);text-align:right;line-height:1.4}
+.tb-badge{background:var(--teal);font-size:.58rem;font-weight:700;letter-spacing:.1em;
+  padding:.2rem .55rem;color:#fff}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:180px;background:var(--panel);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;flex-shrink:0}
+.sb-section{font-family:var(--mono);font-size:.52rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--grey);padding:.7rem 1rem .3rem;
+  border-top:1px solid var(--line)}
+.sb-section:first-child{border-top:none;padding-top:1rem}
+.sb-btn{display:flex;align-items:center;gap:.6rem;padding:.55rem 1rem;
+  cursor:pointer;transition:all .15s;border:none;background:none;
+  width:100%;text-align:left;color:rgba(255,255,255,.45);font-size:.78rem}
+.sb-btn:hover{color:#fff;background:rgba(255,255,255,.04)}
+.sb-btn.active{color:var(--teal3);background:rgba(0,200,168,.08);
+  border-left:2px solid var(--teal3)}
+.sb-icon{font-size:.9rem;width:16px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;
+  font-size:.55rem;font-weight:700;border-radius:2px;padding:.1rem .35rem}
+.sb-badge.amber{background:var(--amber)}
+.sb-badge.teal{background:var(--teal);color:#fff}
+.sb-footer{margin-top:auto;padding:.8rem 1rem;border-top:1px solid var(--line)}
+.sb-footer-label{font-size:.58rem;color:var(--grey)}
+.sb-footer-val{font-size:.72rem;color:var(--green2);font-weight:600}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-thumb{background:var(--teal)}
+.view{display:none;flex:1;flex-direction:column;padding:1.2rem}
+.view.active{display:flex}
+.view-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-shrink:0}
+.view-title{font-size:1.1rem;font-weight:700;color:#fff}
+.view-sub{font-size:.72rem;color:var(--faint);margin-top:.15rem}
+.view-actions{display:flex;gap:.5rem}
+.btn{font-family:var(--mono);font-size:.58rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;padding:.4rem .9rem;border:none;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--teal3);color:var(--bg)}
+.btn-primary:hover{background:#fff}
+.btn-outline{background:transparent;border:1px solid var(--line2);color:var(--teal3)}
+.btn-outline:hover{background:rgba(0,200,168,.1)}
+.btn-red{background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);color:var(--red2)}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:.6rem;margin-bottom:1.2rem;flex-shrink:0}
+.kpi{background:var(--panel);border:1px solid var(--line);padding:.7rem .8rem;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.teal::before{background:var(--teal3)}
+.kpi.red::before{background:var(--red)}
+.kpi.amber::before{background:var(--amber)}
+.kpi.green::before{background:var(--green2)}
+.kpi.gold::before{background:var(--gold2)}
+.kpi-n{font-size:1.5rem;font-weight:700;font-style:italic;color:#fff;line-height:1}
+.kpi-l{font-size:.6rem;color:var(--grey);margin-top:.2rem;line-height:1.4}
+.kpi-delta{position:absolute;top:.5rem;right:.6rem;font-size:.6rem;font-weight:700}
+.kpi-delta.up{color:var(--green2)}
+.kpi-delta.down{color:var(--red2)}
+
+/* ── GRID LAYOUTS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:.8rem}
+
+/* ── PANEL CARD ── */
+.card{background:var(--panel);border:1px solid var(--line);padding:1rem;flex-shrink:0}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.card-title{font-family:var(--mono);font-size:.6rem;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--teal3)}
+.card-title.red{color:var(--red2)}
+.card-title.gold{color:var(--gold2)}
+
+/* ── PREDICTION TABLE ── */
+.pred-table{width:100%;border-collapse:collapse}
+.pred-table th{font-family:var(--mono);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--grey);padding:.4rem .6rem;border-bottom:1px solid var(--line);text-align:left;font-weight:400}
+.pred-table td{padding:.55rem .6rem;border-bottom:1px solid var(--line);vertical-align:middle;font-size:.78rem}
+.pred-table tr:hover td{background:rgba(255,255,255,.02)}
+.pred-table tr:last-child td{border-bottom:none}
+.fpi-bar{display:flex;align-items:center;gap:.4rem}
+.fpi-track{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:0}
+.fpi-fill{height:100%;border-radius:0;transition:width .3s}
+.status-pill{font-family:var(--mono);font-size:.55rem;font-weight:700;letter-spacing:.06em;
+  padding:.18rem .5rem;text-transform:uppercase}
+.status-pill.critical{background:rgba(220,38,38,.2);color:var(--red2)}
+.status-pill.high{background:rgba(217,119,6,.2);color:var(--amber)}
+.status-pill.medium{background:rgba(0,92,78,.2);color:var(--teal3)}
+.status-pill.low{background:rgba(148,163,184,.1);color:var(--faint)}
+.action-btn{font-family:var(--mono);font-size:.55rem;font-weight:700;
+  padding:.2rem .5rem;border:1px solid var(--line2);color:var(--teal3);
+  background:transparent;cursor:pointer;transition:all .12s}
+.action-btn:hover{background:rgba(0,200,168,.1)}
+.action-btn.red{border-color:rgba(220,38,38,.3);color:var(--red2)}
+.action-btn.red:hover{background:rgba(220,38,38,.08)}
+
+/* ── CHART BARS ── */
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:60px}
+.bar{flex:1;transition:height .3s;min-height:4px;position:relative}
+.bar:hover::after{content:attr(data-tip);position:absolute;bottom:105%;left:50%;
+  transform:translateX(-50%);background:var(--panel2);
+  color:#fff;padding:.2rem .4rem;font-size:.6rem;white-space:nowrap;z-index:10}
+
+/* ── WORK ORDERS ── */
+.wo-card{background:var(--panel2);border:1px solid var(--line);padding:.8rem;margin-bottom:.5rem;
+  display:flex;align-items:flex-start;gap:.8rem;cursor:pointer;transition:all .15s}
+.wo-card:hover{border-color:var(--teal2)}
+.wo-priority{width:4px;height:100%;min-height:40px;flex-shrink:0;align-self:stretch}
+.wo-priority.p1{background:var(--red)}
+.wo-priority.p2{background:var(--amber)}
+.wo-priority.p3{background:var(--teal)}
+.wo-body{flex:1}
+.wo-id{font-family:var(--mono);font-size:.6rem;color:var(--grey)}
+.wo-title{font-size:.82rem;font-weight:600;color:#fff;margin:.1rem 0}
+.wo-meta{font-size:.68rem;color:var(--faint)}
+.wo-status{font-family:var(--mono);font-size:.58rem;font-weight:700;
+  padding:.15rem .4rem;margin-left:auto;flex-shrink:0}
+.wo-status.open{background:rgba(217,119,6,.15);color:var(--amber)}
+.wo-status.progress{background:rgba(0,92,78,.15);color:var(--teal3)}
+.wo-status.complete{background:rgba(21,128,61,.15);color:var(--green2)}
+.wo-status.ai{background:rgba(59,130,246,.15);color:#60A5FA}
+
+/* ── ASSET TABLE ── */
+.asset-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px;
+  gap:.5rem;padding:.5rem .7rem;align-items:center;font-size:.75rem;
+  border-bottom:1px solid var(--line)}
+.asset-row:hover{background:rgba(255,255,255,.02)}
+.asset-row.header{font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--grey);font-weight:400;
+  border-bottom:2px solid var(--teal)}
+.condition-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── BUDGET OPTIMISER ── */
+.budget-bar{display:flex;height:28px;border-radius:0;overflow:hidden;margin:.5rem 0}
+.budget-seg{display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;font-weight:700;transition:all .3s;cursor:pointer}
+.budget-seg:hover{filter:brightness(1.2)}
+
+/* ── AUDIT LOG ── */
+.log-entry{display:flex;gap:.7rem;padding:.5rem 0;border-bottom:1px solid var(--line);
+  font-size:.75rem}
+.log-time{font-family:var(--mono);font-size:.62rem;color:var(--grey);flex-shrink:0;width:72px}
+.log-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:.7rem;flex-shrink:0}
+.log-body{flex:1}
+.log-title{color:#fff;font-weight:500}
+.log-detail{color:var(--faint);font-size:.68rem;margin-top:.1rem}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--panel2);border:1px solid var(--line2);
+  width:520px;max-width:95vw;padding:1.5rem;position:relative}
+.modal-close{position:absolute;top:.8rem;right:.8rem;background:none;border:none;
+  color:var(--grey);cursor:pointer;font-size:1.1rem}
+.modal-title{font-size:1rem;font-weight:700;color:#fff;margin-bottom:.5rem}
+.modal-subtitle{font-size:.78rem;color:var(--teal3);margin-bottom:1rem}
+.form-group{margin-bottom:.8rem}
+.form-label{display:block;font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--grey);margin-bottom:.3rem}
+.form-input{width:100%;background:var(--bg);border:1px solid var(--line);
+  color:#fff;padding:.5rem .7rem;font-size:.8rem;font-family:var(--font)}
+.form-input:focus{outline:none;border-color:var(--teal3)}
+.form-select{width:100%;background:var(--bg);border:1px solid var(--line);
+  color:#fff;padding:.5rem .7rem;font-size:.8rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+
+/* ── NOTIFICATION ── */
+.notif{position:fixed;top:58px;right:1rem;z-index:600;
+  background:var(--panel2);border:1px solid var(--teal2);
+  padding:.8rem 1rem;max-width:320px;display:none;animation:slideIn .25s ease}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.notif.show{display:block}
+.notif-title{font-size:.8rem;font-weight:700;color:var(--teal3);margin-bottom:.2rem}
+.notif-body{font-size:.72rem;color:rgba(255,255,255,.65)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--teal)}
+::-webkit-scrollbar-track{background:transparent}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-logo">
+    <svg class="tb-hex" viewBox="0 0 40 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="20,2 38,12 38,34 20,44 2,34 2,12" stroke="#fff" stroke-width="2.5" fill="none"/>
+      <line x1="20" y1="10" x2="20" y2="36" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      <line x1="7" y1="17" x2="33" y2="29" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      <line x1="33" y1="17" x2="7" y2="29" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="20" cy="23" r="3.5" fill="#00C8A8"/>
+    </svg>
+    <div>
+      <div class="tb-brand">SENTINAL AFRICA</div>
+      <span class="tb-sub">Infrastructure Intelligence · GovTech Hackathon 2026</span>
+    </div>
+  </div>
+  <div class="tb-divider"></div>
+  <div class="tb-dept"><strong>City of Ekurhuleni</strong> · Water &amp; Sanitation <span style="font-size:.58rem;color:var(--amber)">(Pipeline — No MOU)</span></div>
+  <div class="tb-divider"></div>
+  <div class="tb-badge">PROTOTYPE</div>
+  <div class="tb-spacer"></div>
+  <div class="tb-alert">
+    <div class="tb-alert-dot"></div>
+    <span>3 Critical Alerts Active</span>
+  </div>
+  <div class="tb-divider"></div>
+  <div class="tb-time" id="clock">Mon 14 Sep 2026<br>08:41:22</div>
+</div>
+
+<div style="background:rgba(217,119,6,.12);border-bottom:1px solid rgba(217,119,6,.25);padding:.3rem 1.2rem;display:flex;align-items:center;gap:1rem;font-size:.68rem;flex-shrink:0">
+  <span style="color:var(--amber);font-weight:700">⚡ PROTOTYPE DEMONSTRATION</span>
+  <span style="color:rgba(255,255,255,.35)">·</span>
+  <span style="color:rgba(255,255,255,.55)">Funding: <strong style="color:var(--teal3)">NEF WEF R5M — Submitted ✅</strong></span>
+  <span style="color:rgba(255,255,255,.35)">·</span>
+  <span style="color:rgba(255,255,255,.55)">NEF iMbewu R3.5M — <strong style="color:var(--amber)">In Process ⚡</strong></span>
+  <span style="color:rgba(255,255,255,.35)">·</span>
+  <span style="color:rgba(255,255,255,.55)">TIA R1M — <strong style="color:var(--amber)">Pending ⚡</strong></span>
+  <span style="color:rgba(255,255,255,.35)">·</span>
+  <span style="color:rgba(255,255,255,.55)">Series A R85M — <strong style="color:var(--amber)">In Progress ⚡</strong></span>
+  <span style="color:rgba(255,255,255,.35)">·</span>
+  <span style="color:rgba(255,255,255,.55)">Govt Pipeline: <strong style="color:var(--amber)">4 depts, 0 MOUs signed ⚡</strong></span>
+</div>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-section">Platform</div>
+  <button class="sb-btn active" onclick="nav('dashboard',this)"><span class="sb-icon">📊</span>Dashboard</button>
+  <button class="sb-btn" onclick="nav('predictions',this)"><span class="sb-icon">🤖</span>AI Predictions<span class="sb-badge">3</span></button>
+  <button class="sb-btn" onclick="nav('workorders',this)"><span class="sb-icon">🔧</span>Work Orders<span class="sb-badge amber">7</span></button>
+  <button class="sb-btn" onclick="nav('assets',this)"><span class="sb-icon">🏗</span>Asset Registry</button>
+  <button class="sb-btn" onclick="nav('budget',this)"><span class="sb-icon">💰</span>Budget Optimiser</button>
+
+  <div class="sb-section">Intelligence</div>
+  <button class="sb-btn" onclick="nav('sensors',this)"><span class="sb-icon">📡</span>Sensor Network<span class="sb-badge teal">97</span></button>
+  <button class="sb-btn" onclick="nav('gis',this)"><span class="sb-icon">🗺</span>GIS Map</button>
+  <button class="sb-btn" onclick="nav('audit',this)"><span class="sb-icon">📋</span>Audit Trail</button>
+  <button class="sb-btn" onclick="nav('kpi',this)"><span class="sb-icon">📈</span>KPI Scorecard</button>
+
+  <div class="sb-section">Admin</div>
+  <button class="sb-btn" onclick="nav('reports',this)"><span class="sb-icon">📄</span>Reports</button>
+
+  <div class="sb-footer">
+    <div class="sb-footer-label">Model Accuracy</div>
+    <div class="sb-footer-val">78.4% (Day 47)</div>
+    <div class="sb-footer-label" style="margin-top:.4rem">Last Sync</div>
+    <div class="sb-footer-val" id="lastSync">08:41:10</div>
+    <div style="margin-top:.6rem;padding:.4rem;background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.3)">
+      <div style="font-size:.58rem;color:var(--amber);font-weight:700;line-height:1.5">⚡ PROTOTYPE MODE<br>Pipeline client scenario<br>No MOU signed yet</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════ DASHBOARD ══════════ -->
+<div class="main">
+<div class="view active" id="v-dashboard">
+  <div class="view-hdr">
+    <div>
+      <div class="view-title">Mission Control Dashboard</div>
+      <div class="view-sub">Live prototype · Possible client: City of Ekurhuleni · No MOU signed · Pilot-ready</div>
+    </div>
+    <div class="view-actions">
+      <button class="btn btn-outline" onclick="exportReport()">Export Report</button>
+      <button class="btn btn-primary" onclick="showModal('newWorkOrder')">+ Work Order</button>
+    </div>
+  </div>
+
+  <div class="kpi-strip">
+    <div class="kpi teal"><div class="kpi-n" id="kpi-assets">97</div><div class="kpi-l">Assets<br>Monitored</div><div class="kpi-delta up">↑4</div></div>
+    <div class="kpi red"><div class="kpi-n" id="kpi-critical">3</div><div class="kpi-l">Critical<br>Alerts</div><div class="kpi-delta down">↑2</div></div>
+    <div class="kpi amber"><div class="kpi-n" id="kpi-wo">7</div><div class="kpi-l">Open Work<br>Orders</div><div class="kki-delta up">↓1</div></div>
+    <div class="kpi green"><div class="kpi-n">R2.1M</div><div class="kpi-l">Cost Avoided<br>This Quarter</div><div class="kpi-delta up">↑</div></div>
+    <div class="kpi gold"><div class="kpi-n">78%</div><div class="kpi-l">AI Model<br>Accuracy Day 47</div><div class="kpi-delta up">↑3</div></div>
+    <div class="kpi teal"><div class="kpi-n">47</div><div class="kpi-l">Predictions<br>This Month</div><div class="kpi-delta up">+12</div></div>
+  </div>
+
+  <!-- AGSA REFERENCE BANNER -->
+  <div style="background:rgba(0,92,78,.08);border:1px solid rgba(0,200,168,.15);padding:.5rem .8rem;margin-bottom:.8rem;display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap">
+    <div style="font-family:var(--mono);font-size:.56rem;font-weight:700;letter-spacing:.12em;color:var(--teal3);flex-shrink:0;margin-top:.05rem">AGSA EVIDENCE BASE</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;flex:1">
+      <span style="font-size:.68rem;color:rgba(255,255,255,.6)"><strong style="color:#fff">R14.73B</strong> water losses nationally <span style="color:var(--teal3);font-size:.6rem">AGSA 2024-25</span></span>
+      <span style="font-size:.68rem;color:rgba(255,255,255,.6)"><strong style="color:#fff">203/257</strong> municipalities insufficient maintenance budget <span style="color:var(--teal3);font-size:.6rem">AGSA 2021-22</span></span>
+      <span style="font-size:.68rem;color:rgba(255,255,255,.6)"><strong style="color:#fff">0 metros</strong> received clean audit 2024-25 <span style="color:var(--teal3);font-size:.6rem">AGSA 2024-25</span></span>
+      <span style="font-size:.68rem;color:rgba(255,255,255,.6)"><strong style="color:#fff">99%</strong> wastewater plants failing ≥1 standard <span style="color:var(--teal3);font-size:.6rem">Parliament Water Committee Dec 2025</span></span>
+      <span style="font-size:.68rem;color:rgba(255,255,255,.6)"><strong style="color:#fff">R400B</strong> cost to fix SA water infrastructure <span style="color:var(--teal3);font-size:.6rem">Minister Majodina Jan 2026</span></span>
+    </div>
+  </div>
+
+  <div class="grid-2-1" style="flex:1;min-height:0">
+    <div style="display:flex;flex-direction:column;gap:.8rem">
+
+      <!-- Critical predictions -->
+      <div class="card" style="flex-shrink:0">
+        <div class="card-hdr">
+          <div class="card-title red">🔴 Critical Failure Predictions — Action Required</div>
+          <button class="btn btn-outline" onclick="nav('predictions',document.querySelector('.sb-btn:nth-child(6)'))">View All</button>
+        </div>
+        <table class="pred-table">
+          <tr><th>Asset</th><th>Fault Type</th><th>FPI Score</th><th>Time Window</th><th>Prevent Cost</th><th>Failure Cost</th><th>Action</th></tr>
+          <tr>
+            <td><strong>Palmiet Booster Pump Station</strong><br><small style="color:var(--faint)">Secondary Motor — Zone A</small></td>
+            <td>Bearing Degradation<br><small style="color:var(--faint)">Vibration anomaly +340%</small></td>
+            <td>
+              <div class="fpi-bar">
+                <div class="fpi-track"><div class="fpi-fill" style="width:91%;background:var(--red)"></div></div>
+                <span style="color:var(--red);font-weight:700;font-size:.85rem">91</span>
+              </div>
+            </td>
+            <td style="color:var(--red2);font-weight:600">14 days</td>
+            <td style="color:var(--green2)">R2,200</td>
+            <td style="color:var(--red2)">R180,000</td>
+            <td><button class="action-btn" onclick="createWO('PS-PAL','Bearing Replacement','P1')">Raise WO</button></td>
+          </tr>
+          <tr>
+            <td><strong>Nasmith Road O2 Pipeline</strong><br><small style="color:var(--faint)">DN800 Pipe — Sector 3</small></td>
+            <td>Acoustic Anomaly<br><small style="color:var(--faint)">Pressure differential +18%</small></td>
+            <td>
+              <div class="fpi-bar">
+                <div class="fpi-track"><div class="fpi-fill" style="width:88%;background:var(--red)"></div></div>
+                <span style="color:var(--red);font-weight:700;font-size:.85rem">88</span>
+              </div>
+            </td>
+            <td style="color:var(--red2);font-weight:600">7 days</td>
+            <td style="color:var(--green2)">R85,000</td>
+            <td style="color:var(--red2)">R1,400,000</td>
+            <td><button class="action-btn red" onclick="createWO('WM-NAS','Emergency Pipe Inspection','P1')">URGENT</button></td>
+          </tr>
+          <tr>
+            <td><strong>Bridge BRG-MON</strong><br><small style="color:var(--faint)">Pedestrian — Ward 15</small></td>
+            <td>Structural Stress<br><small style="color:var(--faint)">Strain gauge deviation 12%</small></td>
+            <td>
+              <div class="fpi-bar">
+                <div class="fpi-track"><div class="fpi-fill" style="width:79%;background:var(--amber)"></div></div>
+                <span style="color:var(--amber);font-weight:700;font-size:.85rem">79</span>
+              </div>
+            </td>
+            <td style="color:var(--amber);font-weight:600">21 days</td>
+            <td style="color:var(--green2)">R45,000</td>
+            <td style="color:var(--red2)">R380,000</td>
+            <td><button class="action-btn" onclick="createWO('BRG-MON','Structural Inspection','P2')">Raise WO</button></td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Active Work Orders -->
+      <div class="card" style="flex-shrink:0">
+        <div class="card-hdr">
+          <div class="card-title">⚡ Active Work Orders</div>
+          <button class="btn btn-outline" onclick="nav('workorders',document.querySelectorAll('.sb-btn')[2])">View All</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+          <div class="wo-card"><div class="wo-priority p1"></div><div class="wo-body"><div class="wo-id">WO-2026-089 · AI-Generated</div><div class="wo-title">PS-WIN Pump Seal Replacement</div><div class="wo-meta">Assigned: J. Dlamini · Due: 16 Sep</div></div><span class="wo-status progress">In Progress</span></div>
+          <div class="wo-card"><div class="wo-priority p2"></div><div class="wo-body"><div class="wo-id">WO-2026-091 · AI-Generated</div><div class="wo-title">HVAC Zone B Filter — Civic Centre</div><div class="wo-meta">Assigned: T. Mokoena · Due: 18 Sep</div></div><span class="wo-status open">Open</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div style="display:flex;flex-direction:column;gap:.8rem">
+      <!-- Risk chart -->
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Asset Risk Distribution</div></div>
+        <div class="bar-chart" id="riskChart">
+          <div class="bar" style="background:var(--red);height:75%" data-tip="Critical: 3"></div>
+          <div class="bar" style="background:var(--amber);height:55%" data-tip="High: 8"></div>
+          <div class="bar" style="background:var(--teal3);height:85%" data-tip="Medium: 12"></div>
+          <div class="bar" style="background:var(--teal);height:45%" data-tip="Low: 21"></div>
+          <div class="bar" style="background:var(--grey);height:95%" data-tip="Healthy: 53"></div>
+        </div>
+        <div style="display:flex;gap:.5rem;margin-top:.4rem;flex-wrap:wrap">
+          <span style="font-size:.6rem;color:var(--red2)">■ Critical 3</span>
+          <span style="font-size:.6rem;color:var(--amber)">■ High 8</span>
+          <span style="font-size:.6rem;color:var(--teal3)">■ Medium 12</span>
+          <span style="font-size:.6rem;color:var(--teal)">■ Low 21</span>
+          <span style="font-size:.6rem;color:var(--grey)">■ Healthy 53</span>
+        </div>
+      </div>
+
+      <!-- Budget snapshot -->
+      <div class="card">
+        <div class="card-hdr"><div class="card-title gold">Budget Snapshot</div></div>
+        <div style="margin-bottom:.5rem">
+          <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--faint);margin-bottom:.2rem">
+            <span>Annual Budget</span><span style="color:#fff;font-weight:600">R68.5M</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--faint);margin-bottom:.2rem">
+            <span>Spent to Date (Q1–Q2)</span><span style="color:var(--amber);font-weight:600">R38.2M (55.8%)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--faint);margin-bottom:.4rem">
+            <span>RAPS Recommended Remaining</span><span style="color:var(--green2);font-weight:600">R30.3M</span>
+          </div>
+          <div style="height:8px;background:rgba(255,255,255,.08)">
+            <div style="height:100%;width:55.8%;background:var(--amber)"></div>
+          </div>
+        </div>
+        <div style="font-size:.68rem;color:var(--faint);border-top:1px solid var(--line);padding-top:.5rem">
+          RAPS has prioritised: Reactive R8.2M · Preventive R22.1M<br>
+          <span style="color:var(--green2)">Est. cost avoidance vs reactive-only: R2.1M this quarter</span><br>
+          <span style="color:var(--teal3);font-size:.62rem">AGSA 2024-25: Nationally R14.73B lost to infrastructure neglect — SENTINAL prevents this at asset level</span>
+        </div>
+      </div>
+
+      <!-- Audit trail recent -->
+      <div class="card" style="flex:1">
+        <div class="card-hdr"><div class="card-title">Recent Audit Trail</div></div>
+        <div class="log-entry">
+          <div class="log-time">08:41:02</div>
+          <div class="log-icon" style="background:rgba(220,38,38,.2)">🤖</div>
+          <div class="log-body"><div class="log-title">AI alert: PS-PAL FPI crossed 90 threshold</div><div class="log-detail">Bearing degradation confirmed · Work order recommendation generated</div></div>
+        </div>
+        <div class="log-entry">
+          <div class="log-time">07:55:14</div>
+          <div class="log-icon" style="background:rgba(0,92,78,.2)">✅</div>
+          <div class="log-body"><div class="log-title">WO-089 authorised — J. Nkosi (Director)</div><div class="log-detail">PFMA Section 38 authority · R2,200 approved · Ref: AUTH-2026-089</div></div>
+        </div>
+        <div class="log-entry">
+          <div class="log-time">06:30:00</div>
+          <div class="log-icon" style="background:rgba(0,92,78,.2)">📡</div>
+          <div class="log-body"><div class="log-title">Sensor sync complete — 97/100 active</div><div class="log-detail">3 sensors offline: PS-PAL-02 (load shedding), BRG-MON (comms fault), RES-COS (scheduled calibration)</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ AI PREDICTIONS ══════════ -->
+<div class="view" id="v-predictions">
+  <div class="view-hdr">
+    <div>
+      <div class="view-title">AI Failure Prediction Engine</div>
+      <div class="view-sub">RAPS Algorithm · Model accuracy 78.4% at Day 47 · 47 predictions this month · 3 confirmed failures prevented · <span style="color:var(--teal3)">AGSA 2024-25: R14.73B water losses + R21.63B electricity losses nationally from infrastructure neglect</span></div>
+    </div>
+    <div class="view-actions">
+      <button class="btn btn-outline">Run Manual Scan</button>
+      <button class="btn btn-primary" onclick="runScan()">🔄 Refresh Predictions</button>
+    </div>
+  </div>
+
+  <div class="kpi-strip" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi red"><div class="kpi-n">3</div><div class="kpi-l">Critical Predictions<br>FPI ≥ 85</div></div>
+    <div class="kpi amber"><div class="kpi-n">8</div><div class="kpi-l">High Risk<br>FPI 65–84</div></div>
+    <div class="kpi teal"><div class="kpi-n">78.4%</div><div class="kpi-l">Model Accuracy<br>Day 47 of training</div></div>
+    <div class="kpi green"><div class="kpi-n">R2.1M</div><div class="kpi-l">Cost Avoided<br>This quarter</div></div>
+  </div>
+
+  <div class="card" style="flex:1">
+    <div class="card-hdr">
+      <div class="card-title">All Active Predictions — Ranked by RAPS Score</div>
+      <div style="display:flex;gap:.4rem">
+        <select class="form-select" style="width:120px;padding:.25rem .5rem;font-size:.7rem">
+          <option>All Asset Types</option><option>Pumps</option><option>Pipes</option><option>Bridges</option><option>HVAC</option>
+        </select>
+        <select class="form-select" style="width:100px;padding:.25rem .5rem;font-size:.7rem">
+          <option>All Status</option><option>Critical</option><option>High</option><option>Medium</option>
+        </select>
+      </div>
+    </div>
+    <table class="pred-table">
+      <tr><th>RAPS</th><th>Asset ID / Name</th><th>Fault Predicted</th><th>FPI</th><th>Window</th><th>Prevent Cost</th><th>Failure Cost</th><th>Saving Ratio</th><th>Status</th><th>Action</th></tr>
+      <tr id="pred-row-1">
+        <td style="font-weight:700;color:var(--red2);font-size:1rem">#1</td>
+        <td><strong>PS-PAL</strong> · Palmiet Booster Pump Station<br><small style="color:var(--faint)">Secondary Motor · Zone A</small></td>
+        <td>Bearing Degradation<br><small style="color:var(--faint)">Vibration +340% · 3 sensors confirming</small></td>
+        <td><div class="fpi-bar"><div class="fpi-track"><div class="fpi-fill" style="width:91%;background:var(--red)"></div></div><strong style="color:var(--red)">91</strong></div></td>
+        <td style="color:var(--red2);font-weight:600">14 days</td>
+        <td style="color:var(--green2)">R2,200</td>
+        <td style="color:var(--red2)">R180,000</td>
+        <td style="color:var(--green2);font-weight:700">82×</td>
+        <td><span class="status-pill critical">Critical</span></td>
+        <td><button class="action-btn" onclick="createWO('PS-PAL','Bearing Replacement','P1')">Raise P1</button></td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--red2);font-size:1rem">#2</td>
+        <td><strong>WM-NAS</strong> · Nasmith Road O2 Pipeline<br><small style="color:var(--faint)">DN800 Pipe · Sector 3</small></td>
+        <td>Acoustic Anomaly<br><small style="color:var(--faint)">Pressure differential +18% · deteriorating</small></td>
+        <td><div class="fpi-bar"><div class="fpi-track"><div class="fpi-fill" style="width:88%;background:var(--red)"></div></div><strong style="color:var(--red)">88</strong></div></td>
+        <td style="color:var(--red2);font-weight:600">7 days</td>
+        <td style="color:var(--green2)">R85,000</td>
+        <td style="color:var(--red2)">R1,400,000</td>
+        <td style="color:var(--green2);font-weight:700">16×</td>
+        <td><span class="status-pill critical">Critical</span></td>
+        <td><button class="action-btn red" onclick="createWO('WM-NAS','Emergency Inspection','P1')">URGENT</button></td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--amber);font-size:1rem">#3</td>
+        <td><strong>BRG-MON</strong> · Bridge Rondebult Rd<br><small style="color:var(--faint)">Pedestrian · Ward 15</small></td>
+        <td>Structural Stress<br><small style="color:var(--faint)">Strain gauge deviation 12%</small></td>
+        <td><div class="fpi-bar"><div class="fpi-track"><div class="fpi-fill" style="width:79%;background:var(--amber)"></div></div><strong style="color:var(--amber)">79</strong></div></td>
+        <td style="color:var(--amber);font-weight:600">21 days</td>
+        <td style="color:var(--green2)">R45,000</td>
+        <td style="color:var(--red2)">R380,000</td>
+        <td style="color:var(--green2);font-weight:700">8.4×</td>
+        <td><span class="status-pill high">High</span></td>
+        <td><button class="action-btn" onclick="createWO('BRG-MON','Structural Inspection','P2')">Raise P2</button></td>
+      </tr>
+      <tr>
+        <td style="color:var(--amber)">#4</td>
+        <td><strong>GEN-B02</strong> · Hospital Generator B<br><small style="color:var(--faint)">Brakpan District Hospital</small></td>
+        <td>Fuel System Anomaly<br><small style="color:var(--faint)">Consumption rate +22% vs baseline</small></td>
+        <td><div class="fpi-bar"><div class="fpi-track"><div class="fpi-fill" style="width:65%;background:var(--amber)"></div></div><strong style="color:var(--amber)">65</strong></div></td>
+        <td style="color:var(--amber)">30 days</td>
+        <td style="color:var(--green2)">R4,500</td>
+        <td style="color:var(--amber)">R28,000</td>
+        <td style="color:var(--green2);font-weight:700">6.2×</td>
+        <td><span class="status-pill high">High</span></td>
+        <td><button class="action-btn" onclick="createWO('GEN-B02','Fuel System Check','P2')">Raise P2</button></td>
+      </tr>
+      <tr>
+        <td style="color:var(--teal3)">#5</td>
+        <td><strong>HVAC-C14</strong> · Civic Centre Zone C<br><small style="color:var(--faint)">Main Admin Building</small></td>
+        <td>Filter Blockage<br><small style="color:var(--faint)">Temperature differential trending high</small></td>
+        <td><div class="fpi-bar"><div class="fpi-track"><div class="fpi-fill" style="width:54%;background:var(--teal3)"></div></div><strong style="color:var(--teal3)">54</strong></div></td>
+        <td>45 days</td>
+        <td style="color:var(--green2)">R3,200</td>
+        <td style="color:var(--amber)">R68,000</td>
+        <td style="color:var(--green2);font-weight:700">21×</td>
+        <td><span class="status-pill medium">Medium</span></td>
+        <td><button class="action-btn" onclick="createWO('HVAC-C14','Filter Replacement','P3')">Raise P3</button></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════ WORK ORDERS ══════════ -->
+<div class="view" id="v-workorders">
+  <div class="view-hdr">
+    <div>
+      <div class="view-title">Work Order Management</div>
+      <div class="view-sub">Smart routing · PFMA-compliant authorisation · Full cost tracking · AGSA audit trail</div>
+    </div>
+    <div class="view-actions">
+      <button class="btn btn-outline">Export WO Register</button>
+      <button class="btn btn-primary" onclick="showModal('newWorkOrder')">+ New Work Order</button>
+    </div>
+  </div>
+  <div id="wo-list">
+    <div class="wo-card"><div class="wo-priority p1"></div><div class="wo-body"><div class="wo-id">WO-2026-091 · AI-Generated · Priority 1 · CRITICAL</div><div class="wo-title">Nasmith Road O2 Pipeline — Emergency Acoustic Investigation</div><div class="wo-meta">Asset: WM-NAS · Assigned: Unassigned · Cost Est: R85,000 · Due: 21 Sep 2026</div></div><span class="wo-status open">Open</span></div>
+    <div class="wo-card"><div class="wo-priority p1"></div><div class="wo-body"><div class="wo-id">WO-2026-089 · AI-Generated · Priority 1</div><div class="wo-title">Windsor Pump Station — Mechanical Seal Replacement</div><div class="wo-meta">Asset: PS-WIN · Assigned: J. Dlamini · Cost Est: R12,400 · Due: 16 Sep 2026</div></div><span class="wo-status progress">In Progress</span></div>
+    <div class="wo-card"><div class="wo-priority p2"></div><div class="wo-body"><div class="wo-id">WO-2026-087 · Manual · Priority 2</div><div class="wo-title">Bridge Ward 8 — Annual Structural Inspection</div><div class="wo-meta">Asset: BRG-MON (Montsu Bridge) · Assigned: Ext. Engineer · Cost Est: R45,000 · Due: 30 Sep 2026</div></div><span class="wo-status open">Open</span></div>
+    <div class="wo-card"><div class="wo-priority p2"></div><div class="wo-body"><div class="wo-id">WO-2026-085 · AI-Generated · Priority 2</div><div class="wo-title">Hospital Generator B — Fuel System Diagnostic</div><div class="wo-meta">Asset: GEN-B02 · Assigned: T. Sithole · Cost Est: R4,500 · Due: 25 Sep 2026</div></div><span class="wo-status ai">AI Pending Auth</span></div>
+    <div class="wo-card"><div class="wo-priority p3"></div><div class="wo-body"><div class="wo-id">WO-2026-082 · Manual · Priority 3</div><div class="wo-title">Civic Centre HVAC Zone A — Quarterly Service</div><div class="wo-meta">Asset: HVAC-A02 · Assigned: M. Khumalo · Cost Est: R3,200 · Due: 28 Sep 2026</div></div><span class="wo-status progress">In Progress</span></div>
+    <div class="wo-card"><div class="wo-priority p3"></div><div class="wo-body"><div class="wo-id">WO-2026-078 · Completed</div><div class="wo-title">Mapleton Booster Pump Station — Impeller Replacement</div><div class="wo-meta">Asset: PS-MAP · Completed: 10 Sep 2026 · Actual Cost: R18,200 · Est was R20,000</div></div><span class="wo-status complete">Complete</span></div>
+  </div>
+</div>
+
+<!-- ══════════ ASSET REGISTRY ══════════ -->
+<div class="view" id="v-assets">
+  <div class="view-hdr">
+    <div>
+      <div class="view-title">Asset Registry</div>
+      <div class="view-sub">97 monitored assets · Failure Probability Index scoring · Real-time condition grading</div>
+    </div>
+    <div class="view-actions">
+      <button class="btn btn-outline">Export Register</button>
+      <button class="btn btn-primary">+ Add Asset</button>
+    </div>
+  </div>
+  <div class="card" style="flex:1">
+    <div class="asset-row header">
+      <div>Asset Name</div><div>Type</div><div>Condition</div><div>FPI Score</div><div>Last Inspection</div><div>Action</div>
+    </div>
+    <div id="asset-list">
+      <div class="asset-row"><div><strong>Palmiet Booster Pump Station</strong><br><small style="color:var(--faint)">PS-PAL · Zone A</small></div><div>Pump</div><div style="display:flex;align-items:center;gap:.4rem"><div class="condition-dot" style="background:var(--red)"></div>Critical</div><div style="color:var(--red);font-weight:700">91</div><div>Sep 2026</div><div><button class="action-btn" onclick="createWO('PS-PAL','Bearing Replacement','P1')">Raise WO</button></div></div>
+      <div class="asset-row"><div><strong>Nasmith Road O2 Pipeline</strong><br><small style="color:var(--faint)">WM-NAS · Germiston</small></div><div>Pipeline</div><div style="display:flex;align-items:center;gap:.4rem"><div class="condition-dot" style="background:var(--red)"></div>Critical</div><div style="color:var(--red);font-weight:700">88</div><div>Aug 2026</div><div><button class="action-btn red">Inspect</button></div></div>
+      <div class="asset-row"><div><strong>Montsu Bridge</strong><br><small style="color:var(--faint)">BRG-MON · Thembisa</small></div><div>Bridge</div><div style="display:flex;align-items:center;gap:.4rem"><div class="condition-dot" style="background:var(--amber)"></div>High Risk</div><div style="color:var(--amber);font-weight:700">79</div><div>Jul 2026</div><div><button class="action-btn">Inspect</button></div></div>
+      <div class="asset-row"><div><strong>Hospital Generator B</strong><br><small style="color:var(--faint)">GEN-B02 · Brakpan DH</small></div><div>Generator</div><div style="display:flex;align-items:center;gap:.4rem"><div class="condition-dot" style="background:var(--amber)"></div>High Risk</div><div style="color:var(--amber);font-weight:700">65</div><div>Jun 2026</div><div><button class="action-btn">View</button></div></div>
+      <div class="asset-row"><div><strong>Mapleton Booster Pump Station</strong><br><small style="color:var(--faint)">PS-MAP · Mapleton</small></div><div>Pump</div><div style="display:flex;align-items:center;gap:.4rem"><div class="condition-dot" style="background:var(--teal3)"></div>Good</div><div style="color:var(--teal3);font-weight:700">32</div><div>Sep 2026</div><div><button class="action-btn">View</button></div></div>
+      <div class="asset-row"><div><strong>HVAC Civic Centre A</strong><br><small style="color:var(--faint)">HVAC-A02 · Admin Block</small></div><div>HVAC</div><div style="display:flex;align-items:center;gap:.4rem"><div class="condition-dot" style="background:var(--teal3)"></div>Good</div><div style="color:var(--teal3);font-weight:700">28</div><div>Aug 2026</div><div><button class="action-btn">View</button></div></div>
+      <div class="asset-row"><div><strong>Cossins Reservoir</strong><br><small style="color:var(--faint)">RES-COS · Rondebult/Mapleton Zone</small></div><div>Reservoir</div><div style="display:flex;align-items:center;gap:.4rem"><div class="condition-dot" style="background:var(--green2)"></div>Excellent</div><div style="color:var(--green2);font-weight:700">14</div><div>Sep 2026</div><div><button class="action-btn">View</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ BUDGET OPTIMISER ══════════ -->
+<div class="view" id="v-budget">
+  <div class="view-hdr">
+    <div>
+      <div class="view-title">RAPS Budget Optimiser</div>
+      <div class="view-sub">Risk-Adjusted Priority Score · Routes every rand to the highest-impact asset first</div>
+    </div>
+    <div class="view-actions">
+      <button class="btn btn-primary" onclick="runOptimise()">⚡ Run Optimisation</button>
+    </div>
+  </div>
+  <div class="kpi-strip" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi gold"><div class="kpi-n">R30.3M</div><div class="kpi-l">Remaining<br>Budget Q3–Q4</div></div>
+    <div class="kpi green"><div class="kpi-n">R22.1M</div><div class="kpi-l">RAPS Preventive<br>Allocation</div></div>
+    <div class="kpi red"><div class="kpi-n">R8.2M</div><div class="kpi-l">Reactive<br>Reserve</div></div>
+    <div class="kpi teal"><div class="kpi-n">R2.1M</div><div class="kpi-l">Cost Avoidance<br>This Quarter</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">RAPS Budget Allocation — Q3 2026</div></div>
+      <div class="budget-bar">
+        <div class="budget-seg" style="background:var(--red);width:8.5%" title="Critical">8.5%</div>
+        <div class="budget-seg" style="background:var(--amber);width:28.4%" title="High">28.4%</div>
+        <div class="budget-seg" style="background:var(--teal);width:35.7%" title="Preventive">35.7%</div>
+        <div class="budget-seg" style="background:var(--grey);width:27.4%" title="Planned">27.4%</div>
+      </div>
+      <div style="display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.3rem">
+        <span style="font-size:.65rem;color:var(--red2)">■ Critical R2.6M</span>
+        <span style="font-size:.65rem;color:var(--amber)">■ High R8.6M</span>
+        <span style="font-size:.65rem;color:var(--teal3)">■ Preventive R10.8M</span>
+        <span style="font-size:.65rem;color:var(--grey)">■ Planned R8.3M</span>
+      </div>
+      <div style="margin-top:.8rem;border-top:1px solid var(--line);padding-top:.6rem">
+        <div style="font-size:.72rem;color:var(--faint);margin-bottom:.3rem">RAPS vs Reactive-Only Scenario:</div>
+        <div style="font-size:.8rem;color:var(--green2);font-weight:600">RAPS saves R2.1M this quarter by preventing 3 critical failures before they occur</div>
+        <div style="font-size:.7rem;color:var(--faint);margin-top:.2rem">Reactive-only: R8.8M reactive + R21.5M preventive · RAPS: R2.6M critical + R8.6M high + R10.8M preventive + R8.3M planned</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Top 5 RAPS Priority Actions</div></div>
+      <table class="pred-table">
+        <tr><th>#</th><th>Asset</th><th>RAPS Action</th><th>Budget</th><th>Avoid</th></tr>
+        <tr><td style="color:var(--red2);font-weight:700">1</td><td>PS-PAL</td><td>Bearing replacement NOW</td><td style="color:var(--gold2)">R2,200</td><td style="color:var(--green2)">R180K</td></tr>
+        <tr><td style="color:var(--red2);font-weight:700">2</td><td>WM-NAS</td><td>Acoustic inspection URGENT</td><td style="color:var(--gold2)">R85,000</td><td style="color:var(--green2)">R1.4M</td></tr>
+        <tr><td style="color:var(--amber)">3</td><td>BRG-MON</td><td>Structural survey this week</td><td style="color:var(--gold2)">R45,000</td><td style="color:var(--green2)">R380K</td></tr>
+        <tr><td style="color:var(--amber)">4</td><td>GEN-BPH</td><td>Fuel system diagnostic</td><td style="color:var(--gold2)">R4,500</td><td style="color:var(--green2)">R28K</td></tr>
+        <tr><td style="color:var(--teal3)">5</td><td>HVAC-GCC</td><td>Filter replacement next week</td><td style="color:var(--gold2)">R3,200</td><td style="color:var(--green2)">R68K</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SENSORS ══════════ -->
+<div class="view" id="v-sensors">
+  <div class="view-hdr">
+    <div><div class="view-title">IoT Sensor Network</div><div class="view-sub">LoRaWAN · 868 MHz · 97/100 sensors active · Last sync 08:41:10</div></div>
+  </div>
+  <div class="kpi-strip" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi green"><div class="kpi-n">97</div><div class="kpi-l">Sensors Online</div></div>
+    <div class="kpi red"><div class="kpi-n">3</div><div class="kpi-l">Sensors Offline</div></div>
+    <div class="kpi teal"><div class="kpi-n">4</div><div class="kpi-l">Gateways Active</div></div>
+    <div class="kpi amber"><div class="kpi-n">8.2yr</div><div class="kpi-l">Avg Battery Life</div></div>
+  </div>
+  <div class="card" style="flex:1">
+    <div class="card-hdr"><div class="card-title">Live Sensor Feed — Last 60 Readings</div></div>
+    <table class="pred-table">
+      <tr><th>Sensor ID</th><th>Asset</th><th>Type</th><th>Latest Reading</th><th>Baseline</th><th>Deviation</th><th>Status</th><th>Battery</th></tr>
+      <tr><td style="font-family:var(--mono)">VIB-PSPAL-A</td><td>Palmiet PS Motor</td><td>Vibration</td><td style="color:var(--red2)">12.4 mm/s RMS</td><td>3.2 mm/s RMS</td><td style="color:var(--red2);font-weight:600">+287%</td><td><span class="status-pill critical">Critical</span></td><td>87%</td></tr>
+      <tr><td style="font-family:var(--mono)">ACO-WMNAS-B</td><td>WM-NAS Pipe</td><td>Acoustic</td><td style="color:var(--red2)">-2.4 dB variance</td><td>-0.8 dB</td><td style="color:var(--red2);font-weight:600">+200%</td><td><span class="status-pill critical">Critical</span></td><td>91%</td></tr>
+      <tr><td style="font-family:var(--mono)">STR-BRGMON-C</td><td>Montsu Bridge</td><td>Strain</td><td style="color:var(--amber)">+412 με peak</td><td>+340 με</td><td style="color:var(--amber);font-weight:600">+21%</td><td><span class="status-pill high">High</span></td><td>76%</td></tr>
+      <tr><td style="font-family:var(--mono)">TMP-PSMAP-A</td><td>PS-MAP Motor</td><td>Temperature</td><td>68.2°C</td><td>67.8°C</td><td style="color:var(--teal3)">+0.6%</td><td><span class="status-pill low">Normal</span></td><td>94%</td></tr>
+      <tr><td style="font-family:var(--mono)">VIB-PSWIN-B</td><td>Windsor PS Motor</td><td>Vibration</td><td>4.1 mm/s RMS</td><td>3.9 mm/s RMS</td><td>+5.1%</td><td><span class="status-pill low">Normal</span></td><td>82%</td></tr>
+      <tr><td style="font-family:var(--mono)">FUL-GENBPH-A</td><td>GEN-B02 Fuel</td><td>Flow</td><td style="color:var(--amber)">8.4 L/hr</td><td>6.9 L/hr</td><td style="color:var(--amber)">+21.7%</td><td><span class="status-pill high">High</span></td><td>88%</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════ GIS MAP ══════════ -->
+<div class="view" id="v-gis">
+  <div class="view-hdr">
+    <div><div class="view-title">GIS Infrastructure Map</div><div class="view-sub">Real-time asset condition overlaid on geographic estate</div></div>
+  </div>
+  <div class="card" style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;background:var(--panel2)">
+    <div style="font-size:3rem">🗺</div>
+    <div style="font-size:1rem;color:#fff;font-weight:600">City of Ekurhuleni — Infrastructure GIS</div>
+    <div style="font-size:.8rem;color:var(--faint);text-align:center;max-width:400px">
+      Live GIS map showing all 97 monitored assets colour-coded by FPI score.<br>
+      <strong style="color:var(--red2)">● Critical</strong> &nbsp;
+      <strong style="color:var(--amber)">● High</strong> &nbsp;
+      <strong style="color:var(--teal3)">● Normal</strong> &nbsp;
+      <strong style="color:var(--green2)">● Healthy</strong>
+    </div>
+    <div style="font-size:.7rem;color:var(--grey);border:1px solid var(--line);padding:.5rem 1rem">
+      Full GIS integration available in production deployment · sentinalafrica.co.za
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ AUDIT TRAIL ══════════ -->
+<div class="view" id="v-audit">
+  <div class="view-hdr">
+    <div><div class="view-title">AGSA Audit Trail</div><div class="view-sub">Immutable · Timestamped · Cryptographically signed · Every prediction and human decision recorded · AGSA-evidentiary standard · Designed to survive the audit that AGSA 2024-25 found 99 of 257 municipalities (39%) failing</div></div>
+    <div class="view-actions">
+      <button class="btn btn-outline">Export for AGSA</button>
+      <button class="btn btn-primary">Generate Audit Report</button>
+    </div>
+  </div>
+  <div class="card" style="flex:1">
+    <div class="card-hdr"><div class="card-title">Full Audit Log — 14 September 2026</div></div>
+    <div id="audit-log">
+      <div class="log-entry"><div class="log-time">08:41:02</div><div class="log-icon" style="background:rgba(220,38,38,.2)">🤖</div><div class="log-body"><div class="log-title">AI PREDICTION — PS-PAL FPI exceeded 90 threshold</div><div class="log-detail">Bearing degradation · FPI: 91 · Window: 14 days · Recommended cost: R2,200 · Avoid: R180,000 · Model confidence: 87% · Ref: PRED-2026-PS007-0914</div></div></div>
+      <div class="log-entry"><div class="log-time">08:41:02</div><div class="log-icon" style="background:rgba(59,130,246,.2)">📧</div><div class="log-body"><div class="log-title">ALERT SENT — Director J. Nkosi notified (SMS + Platform)</div><div class="log-detail">Critical alert dispatched · Response required within 24hrs per SENTINAL protocol</div></div></div>
+      <div class="log-entry"><div class="log-time">07:55:14</div><div class="log-icon" style="background:rgba(21,128,61,.2)">✅</div><div class="log-body"><div class="log-title">HUMAN AUTHORISATION — WO-2026-089 approved by J. Nkosi (Director Infrastructure)</div><div class="log-detail">PFMA Section 38(1)(b) authority · R2,200 approved · Preventive maintenance · Ref: AUTH-2026-089 · IP: 196.25.x.x · Browser: Chrome · Timestamp confirmed</div></div></div>
+      <div class="log-entry"><div class="log-time">07:55:15</div><div class="log-icon" style="background:rgba(0,92,78,.2)">🔧</div><div class="log-body"><div class="log-title">WORK ORDER CREATED — WO-2026-089 auto-generated and assigned</div><div class="log-detail">Assigned: J. Dlamini (Artisan Level 3) · Due: 16 Sep 2026 · Parts ordered: Bearing SKF 6205-2RS · SCM ref: PO-2026-1204</div></div></div>
+      <div class="log-entry"><div class="log-time">06:30:01</div><div class="log-icon" style="background:rgba(0,92,78,.2)">📡</div><div class="log-body"><div class="log-title">SENSOR SYNC — 97/100 sensors active · Daily health check complete</div><div class="log-detail">Offline: PS-019 (load shedding — UPS depleted), BR-028 (comms fault), WM-004 (scheduled maintenance) · Alerts generated for facility manager</div></div></div>
+      <div class="log-entry"><div class="log-time">05:00:00</div><div class="log-icon" style="background:rgba(107,79,0,.2)">⚙️</div><div class="log-body"><div class="log-title">MODEL TRAINING — RAPS daily recalibration complete</div><div class="log-detail">Training data: 47 days · 2,840 data points · False positives this week: 1 (WM-008, retracted) · Model accuracy: 78.4% · Previous: 77.1% · Improving</div></div></div>
+    </div>
+    <div style="margin-top:.8rem;background:rgba(0,92,78,.06);border:1px solid rgba(0,200,168,.12);padding:.7rem">
+      <div style="font-family:var(--mono);font-size:.56rem;font-weight:700;letter-spacing:.12em;color:var(--teal3);margin-bottom:.5rem">AGSA FINDINGS THAT THIS AUDIT TRAIL DIRECTLY ADDRESSES</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem .8rem">
+        <div style="font-size:.68rem;color:rgba(255,255,255,.55)">• AGSA 2024-25: 99 municipalities (39%) modified opinions — documentation failures</div>
+        <div style="font-size:.68rem;color:rgba(255,255,255,.55)">• AGSA 2024-25: R6.36B fruitless &amp; wasteful expenditure — lack of evidence trail</div>
+        <div style="font-size:.68rem;color:rgba(255,255,255,.55)">• AGSA 2024-25: 177 municipalities (69%) — unauthorised expenditure R36.05B</div>
+        <div style="font-size:.68rem;color:rgba(255,255,255,.55)">• AGSA 2021-22: 203 municipalities (79%) — insufficient maintenance budget documentation</div>
+      </div>
+      <div style="font-size:.65rem;color:var(--teal3);margin-top:.4rem">Source: AGSA Consolidated Report on Local Government Audit Outcomes 2024-25 · Tabled 24 June 2026 · agsa.co.za/reports/mfma-reports</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ KPI SCORECARD ══════════ -->
+<div class="view" id="v-kpi">
+  <div class="view-hdr">
+    <div><div class="view-title">KPI Scorecard</div><div class="view-sub">15 maintenance KPIs · RAG rated · AGSA-ready · Q2 2026 performance</div></div>
+    <div class="view-actions"><button class="btn btn-primary">Export for EXCO</button></div>
+  </div>
+  <div class="card" style="flex:1">
+    <div class="card-hdr"><div class="card-title">Prototype Scenario — City of Ekurhuleni Water &amp; Sanitation (Pipeline — No MOU Signed)</div></div>
+    <table class="pred-table">
+      <tr><th>KPI</th><th>Target</th><th>Actual</th><th>Score</th><th>RAG</th></tr>
+      <tr><td>Preventive vs Reactive Maintenance Ratio</td><td>≥60% preventive</td><td>62.4%</td><td>104%</td><td><span class="status-pill medium">GREEN</span></td></tr>
+      <tr><td>Mean Time to Repair (MTTR)</td><td>≤48 hours</td><td>41.2 hours</td><td>114%</td><td><span class="status-pill medium">GREEN</span></td></tr>
+      <tr><td>Asset Availability Rate</td><td>≥95%</td><td>96.8%</td><td>102%</td><td><span class="status-pill medium">GREEN</span></td></tr>
+      <tr><td>Budget Utilisation</td><td>95–105%</td><td>97.2%</td><td>100%</td><td><span class="status-pill medium">GREEN</span></td></tr>
+      <tr><td>Non-Revenue Water Rate</td><td>≤35%</td><td>38.4%</td><td>90%</td><td><span class="status-pill high">AMBER</span></td></tr>
+      <tr><td>Planned Maintenance Completion</td><td>≥85%</td><td>88.7%</td><td>104%</td><td><span class="status-pill medium">GREEN</span></td></tr>
+      <tr><td>Work Order Backlog</td><td>≤15 open</td><td>7 open</td><td>120%</td><td><span class="status-pill medium">GREEN</span></td></tr>
+      <tr><td>AI Prediction Accuracy (to date)</td><td>≥70%</td><td>78.4%</td><td>112%</td><td><span class="status-pill medium">GREEN</span></td></tr>
+      <tr><td>Critical Asset Response Time</td><td>≤24 hours</td><td>18.6 hours</td><td>122%</td><td><span class="status-pill medium">GREEN</span></td></tr>
+      <tr><td>Cost Per Asset Managed (annual)</td><td>≤R280K</td><td>R264K</td><td>106%</td><td><span class="status-pill medium">GREEN</span></td></tr>
+    </table>
+    <div style="margin-top:.8rem;background:rgba(0,92,78,.1);padding:.7rem;border-left:3px solid var(--teal3)">
+      <div style="font-size:.75rem;font-weight:600;color:#fff">Prototype Score: <span style="color:var(--green2)">82.4% — GREEN</span></div>
+      <div style="font-size:.7rem;color:var(--faint);margin-top:.2rem">9 of 10 KPIs on target · Non-revenue water 29% (CoE — lowest Gauteng metro, PMG Jan 2025) · AGSA documentation: 100% complete</div>
+      <div style="font-size:.68rem;color:var(--teal3);margin-top:.35rem;border-top:1px solid rgba(0,200,168,.15);padding-top:.35rem">
+        Context: AGSA 2024-25 found zero clean audits across all 8 metros. SENTINAL provides the documentation architecture that audit compliance requires — timestamped, immutable, PFMA-aligned.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ REPORTS ══════════ -->
+<div class="view" id="v-reports">
+  <div class="view-hdr">
+    <div><div class="view-title">Reports</div><div class="view-sub">PFMA-compliant · AGSA-ready documentation · Automated generation</div></div>
+    <div class="view-actions"><button class="btn btn-primary" onclick="showNotif('Monthly Impact Report generated — 14 September 2026','Available for download and submission to Accounting Officer')">Generate Monthly Report</button></div>
+  </div>
+  <div class="grid-3">
+    <div class="card" style="cursor:pointer" onclick="showNotif('Monthly Impact Report','Generating... Ready for Accounting Officer')">
+      <div class="card-title">Monthly Impact Report</div>
+      <div style="font-size:.78rem;color:var(--faint);margin:.5rem 0">September 2026 · PFMA Section 40 compliant · Suitable for EXCO submission</div>
+      <button class="btn btn-outline" style="width:100%;margin-top:.5rem">Generate</button>
+    </div>
+    <div class="card" style="cursor:pointer" onclick="showNotif('AGSA Audit Package','Compiling immutable audit trail for AGSA submission — MFMA Section 126 compliant...')">
+      <div class="card-title">AGSA Audit Package</div>
+      <div style="font-size:.78rem;color:var(--faint);margin:.5rem 0">Full audit trail export · Cryptographically signed · Q2 FY2026/27 · MFMA Section 126 compliant</div>
+      <div style="font-size:.66rem;color:var(--teal3);margin-bottom:.4rem">AGSA 2024-25: 99 municipalities (39%) received modified opinions. This package prevents that.</div>
+      <button class="btn btn-outline" style="width:100%;margin-top:.2rem">Export</button>
+    </div>
+    <div class="card" style="cursor:pointer" onclick="showNotif('Cost Avoidance Report','R2.1M avoidance this quarter · 3 failures prevented · Generated')">
+      <div class="card-title">Cost Avoidance Report</div>
+      <div style="font-size:.78rem;color:var(--faint);margin:.5rem 0">Preventive vs reactive analysis · Q2 saving: R2.1M · For budget motivation</div>
+      <button class="btn btn-outline" style="width:100%;margin-top:.5rem">Generate</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .main -->
+</div><!-- end .app -->
+
+<!-- MODAL — New Work Order -->
+<div class="modal-overlay" id="modal-newWorkOrder">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Create Work Order</div>
+    <div class="modal-subtitle" id="modal-wo-subtitle">AI-recommended action · PFMA Section 38 authorisation required</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Asset ID</label>
+        <input class="form-input" id="wo-asset-id" value="">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Priority</label>
+        <select class="form-select" id="wo-priority">
+          <option value="P1">P1 — Critical (24hr response)</option>
+          <option value="P2">P2 — High (48hr response)</option>
+          <option value="P3">P3 — Medium (5 day response)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Work Description</label>
+      <input class="form-input" id="wo-description" value="">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Estimated Cost (R)</label>
+        <input class="form-input" type="number" id="wo-cost" placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assign To</label>
+        <select class="form-select">
+          <option>J. Dlamini (Artisan L3)</option>
+          <option>T. Mokoena (Technician)</option>
+          <option>T. Sithole (Electrician)</option>
+          <option>External Contractor</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">PFMA Authorisation Note</label>
+      <input class="form-input" placeholder="Authorised under PFMA Section 38(1)(b) — preventive maintenance" id="wo-auth">
+    </div>
+    <div style="display:flex;gap:.6rem;margin-top:1rem">
+      <button class="btn btn-primary" style="flex:1" onclick="submitWO()">Create &amp; Authorise Work Order</button>
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif">
+  <div class="notif-title" id="notif-title"></div>
+  <div class="notif-body" id="notif-body"></div>
+</div>
+
+<script>
+// ── NAVIGATION ──────────────────────────────────────────
+function nav(viewId, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  const v = document.getElementById('v-' + viewId);
+  if (v) v.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ── CLOCK ───────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  document.getElementById('clock').innerHTML =
+    `Mon 14 Sep 2026<br>${t}`;
+  document.getElementById('lastSync').textContent = t;
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ── MODAL ───────────────────────────────────────────────
+function showModal(id) {
+  document.getElementById('modal-' + id).classList.add('open');
+}
+function closeModal() {
+  document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+}
+function createWO(assetId, description, priority) {
+  document.getElementById('wo-asset-id').value = assetId;
+  document.getElementById('wo-description').value = description;
+  document.getElementById('wo-priority').value = priority;
+  document.getElementById('wo-auth').value = 'Authorised under PFMA Section 38(1)(b) — preventive maintenance · AI prediction ref: PRED-2026-' + assetId + '-0914';
+  document.getElementById('modal-wo-subtitle').textContent = 'AI-recommended · FPI threshold exceeded · PFMA Section 38 authorisation required';
+  showModal('newWorkOrder');
+}
+
+function submitWO() {
+  const assetId = document.getElementById('wo-asset-id').value;
+  closeModal();
+  const woNum = 'WO-2026-0' + (92 + Math.floor(Math.random() * 5));
+  // Add to work order list
+  const list = document.getElementById('wo-list');
+  const div = document.createElement('div');
+  div.className = 'wo-card';
+  div.innerHTML = `<div class="wo-priority p1"></div><div class="wo-body"><div class="wo-id">${woNum} · AI-Generated · Just Created</div><div class="wo-title">${document.getElementById('wo-description').value} — ${assetId}</div><div class="wo-meta">Created: ${new Date().toLocaleTimeString()} · AGSA reference logged · PFMA Section 38 authorised</div></div><span class="wo-status ai">Authorised ✓</span>`;
+  list.insertBefore(div, list.firstChild);
+  // Update KPI
+  const woKpi = document.getElementById('kpi-wo');
+  woKpi.textContent = parseInt(woKpi.textContent) + 1;
+  showNotif(woNum + ' Created & Authorised', 'Work order raised for ' + assetId + ' · AGSA audit trail updated · Technician notified');
+  // Add audit log entry
+  const log = document.getElementById('audit-log');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  const t = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  entry.innerHTML = `<div class="log-time">${t}</div><div class="log-icon" style="background:rgba(21,128,61,.2)">✅</div><div class="log-body"><div class="log-title">WORK ORDER CREATED — ${woNum} · ${assetId}</div><div class="log-detail">PFMA Section 38 authority · AI-generated · Audit trail entry created · Immutable record confirmed</div></div>`;
+  log.insertBefore(entry, log.firstChild);
+}
+
+// ── NOTIFICATIONS ────────────────────────────────────────
+function showNotif(title, body) {
+  document.getElementById('notif-title').textContent = title;
+  document.getElementById('notif-body').textContent = body;
+  const n = document.getElementById('notif');
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 4000);
+}
+
+// ── ACTIONS ──────────────────────────────────────────────
+function runScan() {
+  showNotif('AI Scan Complete', '47 assets re-evaluated · 3 critical · 8 high · 12 medium · Model confidence: 78.4%');
+}
+function runOptimise() {
+  showNotif('RAPS Optimisation Complete', 'Budget re-routed · R2.1M cost avoidance maintained · 5 priority actions confirmed');
+}
+function exportReport() {
+  showNotif('Monthly Impact Report Generated', 'September 2026 · PDF ready · PFMA Section 40 compliant · AGSA-ready');
+}
+</script>
+</body>
+</html>
